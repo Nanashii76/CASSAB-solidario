@@ -1,78 +1,227 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import '../styles/invitePage.css'
+
+// Imagens do carrossel
+const IMAGES = [
+    "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2070&auto=format&fit=crop"
+];
 
 export default function InvitePage() {
-    // Estados para capturar os dados do formulário
-    const [nome, setNome] = useState('');
-    const [documento, setDocumento] = useState('');
-    const [acompanhantes, setAcompanhantes] = useState(0);
+    // Estado do Usuário Principal
+    const [formData, setFormData] = useState({
+        nome: '',
+        cpf: '',
+        telefone: '',
+        instagram: ''
+    });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Estado dos Acompanhantes (Lista de objetos)
+    const [acompanhantes, setAcompanhantes] = useState([]);
+
+    // Estado do Carrossel
+    const [currentImage, setCurrentImage] = useState(0);
+
+    // Efeito do Carrossel
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImage((prev) => (prev + 1) % IMAGES.length);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Atualiza dados do form principal
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Adiciona um novo acompanhante vazio
+    const addAcompanhante = () => {
+        setAcompanhantes([...acompanhantes, { nome: '', sobrenome: '' }]);
+    };
+
+    // Remove um acompanhante pelo índice
+    const removeAcompanhante = (index) => {
+        const novaLista = acompanhantes.filter((_, i) => i !== index);
+        setAcompanhantes(novaLista);
+    };
+
+    // Atualiza os dados de um acompanhante específico
+    const handleAcompanhanteChange = (index, field, value) => {
+        const novaLista = [...acompanhantes];
+        novaLista[index][field] = value;
+        setAcompanhantes(novaLista);
+    };
+
+    const handleSubmit = (e) => {
         e.preventDefault();
-        // Aqui vamos disparar a requisição para o Spring Boot depois
-        console.log("Enviando dados:", { nome, documento, acompanhantes });
+        
+        // Montando o JSON final para o Backend
+        const payload = {
+            ...formData,
+            // Removemos espaços vazios caso existam
+            acompanhantes: acompanhantes.filter(a => a.nome.trim() !== '')
+        };
+
+        console.log("JSON PARA O BACKEND:", JSON.stringify(payload, null, 2));
+        alert("JSON gerado no console! (F12)");
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center p-6 font-sans">
+        <div className="split-screen-container">
+            
+            {/* ====== LADO ESQUERDO: Formulário ====== */}
+            <div className="left-pane">
+                <div className="content-wrapper">
+                    
+                    <header className="header-section">
+                        <h1>Cadastro Solidário</h1>
+                        <p>Garanta sua presença e de seus convidados.</p>
+                    </header>
 
-            {/* 1. HEADER (Boas Vindas) */}
-            <header className="w-full max-w-md mt-6">
-                <h1 className="text-3xl font-extrabold text-gray-900 leading-tight">Boas vindas</h1>
-                <p className="text-gray-500 mt-1 font-medium italic">Agradecimentos pelo seu apoio ao evento.</p>
-            </header>
+                    <main>
+                        <span className="form-title">Dados do Titular</span>
 
-            {/* 2. ESPAÇO PARA IMAGEM (Propósito) */}
-            <div className="w-full max-w-md aspect-video bg-gray-200 rounded-2xl mt-8 flex items-center justify-center border-2 border-dashed border-gray-300">
-                <span className="text-gray-400 font-bold uppercase tracking-widest text-sm">IMG Propósito;
-                transição pra outra imagem de apresentação.
-                </span>
+                        <form onSubmit={handleSubmit} className="form-card">
+                            
+                            {/* Nome Completo */}
+                            <div className="form-group">
+                                <label htmlFor="nome">Nome Completo</label>
+                                <input
+                                    id="nome"
+                                    name="nome"
+                                    type="text"
+                                    placeholder="Seu nome"
+                                    className="input-field"
+                                    value={formData.nome}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+
+                            {/* CPF */}
+                            <div className="form-group">
+                                <label htmlFor="cpf">CPF</label>
+                                <input
+                                    id="cpf"
+                                    name="cpf"
+                                    type="text"
+                                    placeholder="000.000.000-00"
+                                    className="input-field"
+                                    value={formData.cpf}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+
+                            {/* Telefone e Instagram */}
+                            <div className="form-group">
+                                <label htmlFor="telefone">Telefone / WhatsApp</label>
+                                <input
+                                    id="telefone"
+                                    name="telefone"
+                                    type="tel"
+                                    placeholder="(61) 90000-0000"
+                                    className="input-field"
+                                    value={formData.telefone}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="instagram">Instagram</label>
+                                <input
+                                    id="instagram"
+                                    name="instagram"
+                                    type="text"
+                                    placeholder="@seu.perfil"
+                                    className="input-field"
+                                    value={formData.instagram}
+                                    onChange={handleInputChange}
+                                />
+                            </div>
+
+                            {/* Área de Acompanhantes */}
+                            <div className="companions-section">
+                                <span className="section-title">
+                                    Acompanhantes ({acompanhantes.length})
+                                </span>
+
+                                {acompanhantes.map((item, index) => (
+                                    <div key={index} className="companion-row">
+                                        <div className="companion-inputs">
+                                            <input
+                                                type="text"
+                                                placeholder="Nome"
+                                                className="input-field"
+                                                value={item.nome}
+                                                onChange={(e) => handleAcompanhanteChange(index, 'nome', e.target.value)}
+                                                required
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Sobrenome"
+                                                className="input-field"
+                                                value={item.sobrenome}
+                                                onChange={(e) => handleAcompanhanteChange(index, 'sobrenome', e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => removeAcompanhante(index)}
+                                            className="btn-remove"
+                                            title="Remover"
+                                        >
+                                            &times;
+                                        </button>
+                                    </div>
+                                ))}
+
+                                <button type="button" onClick={addAcompanhante} className="btn-add">
+                                    + Adicionar Acompanhante
+                                </button>
+                            </div>
+
+                            <button type="submit" className="btn-submit">
+                                GERAR MEU CONVITE
+                            </button>
+                        </form>
+                    </main>
+                </div>
             </div>
 
-            {/* 3. FORMULÁRIO (O "Card" do esboço) */}
-            <main className="w-full max-w-md mt-8">
-                <h2 className="text-gray-400 font-bold uppercase text-xs tracking-widest mb-4 ml-1">
-                    Cadastre-se abaixo
-                </h2>
-
-                <form
-                    onSubmit={handleSubmit}
-                    className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col gap-6"
-                >
-                    {/* Nome */}
-                    <input
-                        type="text"
-                        placeholder="Nome Completo"
-                        className="w-full h-14 px-5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all"
-                        onChange={(e) => setNome(e.target.value)}
-                    />
-
-                    {/* Documento */}
-                    <input
-                        type="text"
-                        placeholder="Documento (CPF ou RG)"
-                        className="w-full h-14 px-5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all"
-                        onChange={(e) => setDocumento(e.target.value)}
-                    />
-
-                    {/* Seletor de Acompanhantes (Sugestão de MVP) */}
-                    <div className="flex items-center justify-between px-2">
-                        <span className="text-sm font-bold text-gray-500 uppercase">Acompanhantes</span>
-                        <div className="flex items-center gap-4">
-                            <button type="button" onClick={() => setAcompanhantes(Math.max(0, acompanhantes - 1))} className="w-8 h-8 rounded-full bg-gray-100 font-bold">-</button>
-                            <span className="font-bold">{acompanhantes}</span>
-                            <button type="button" onClick={() => setAcompanhantes(acompanhantes + 1)} className="w-8 h-8 rounded-full bg-gray-100 font-bold">+</button>
-                        </div>
-                    </div>
-
-                    {/* Botão de Envio */}
-                    <button
-                        type="submit"
-                        className="w-full h-16 bg-blue-600 text-white font-black text-lg rounded-2xl shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all"
+            {/* ====== LADO DIREITO: Imagens (Mantido igual) ====== */}
+            <div className="right-pane">
+                {IMAGES.map((img, index) => (
+                    <div
+                        key={index}
+                        className={`carousel-slide ${index === currentImage ? 'active' : ''}`}
                     >
-                        GERAR MEU CONVITE
-                    </button>
-                </form>
-            </main>
+                        <div className="overlay"></div>
+                        <img src={img} alt={`Slide ${index}`} className="carousel-image" />
+                    </div>
+                ))}
+                
+                <div className="carousel-content">
+                    <span className="carousel-subtitle">Evento Beneficente</span>
+                    <h2 className="carousel-title">Juntos fazemos a diferença.</h2>
+                    <p className="carousel-desc">Preencha seus dados para receber o QR Code de acesso.</p>
+                </div>
+
+                <div className="indicators">
+                    {IMAGES.map((_, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setCurrentImage(idx)}
+                            className={`dot ${idx === currentImage ? 'active' : ''}`}
+                        />
+                    ))}
+                </div>
+            </div>
 
         </div>
     );
