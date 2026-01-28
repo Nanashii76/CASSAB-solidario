@@ -1,7 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import '../styles/invitePage.css'
 
-// Imagens do carrossel
+interface Acompanhante {
+    nome: string;
+    sobrenome: string;
+}
+
+interface UserFormData {
+    nome: string;
+    cpf: string;
+    telefone: string;
+    instagram: string;
+}
+
 const IMAGES = [
     "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop",
@@ -9,21 +20,19 @@ const IMAGES = [
 ];
 
 export default function InvitePage() {
-    // Estado do Usuário Principal
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<UserFormData>({
         nome: '',
         cpf: '',
         telefone: '',
         instagram: ''
     });
 
-    // Estado dos Acompanhantes (Lista de objetos)
-    const [acompanhantes, setAcompanhantes] = useState([]);
+
+    const [acompanhantes, setAcompanhantes] = useState<Acompanhante[]>([]);
 
     // Estado do Carrossel
     const [currentImage, setCurrentImage] = useState(0);
 
-    // Efeito do Carrossel
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImage((prev) => (prev + 1) % IMAGES.length);
@@ -31,37 +40,34 @@ export default function InvitePage() {
         return () => clearInterval(interval);
     }, []);
 
-    // Atualiza dados do form principal
-    const handleInputChange = (e) => {
+    // Tipagem do evento de mudança de input (ChangeEvent)
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Adiciona um novo acompanhante vazio
     const addAcompanhante = () => {
         setAcompanhantes([...acompanhantes, { nome: '', sobrenome: '' }]);
     };
 
-    // Remove um acompanhante pelo índice
-    const removeAcompanhante = (index) => {
+    const removeAcompanhante = (index: number) => {
         const novaLista = acompanhantes.filter((_, i) => i !== index);
         setAcompanhantes(novaLista);
     };
 
-    // Atualiza os dados de um acompanhante específico
-    const handleAcompanhanteChange = (index, field, value) => {
+    const handleAcompanhanteChange = (index: number, field: keyof Acompanhante, value: string) => {
         const novaLista = [...acompanhantes];
-        novaLista[index][field] = value;
-        setAcompanhantes(novaLista);
+        if (novaLista[index]) {
+            novaLista[index][field] = value;
+            setAcompanhantes(novaLista);
+        }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         
-        // Montando o JSON final para o Backend
         const payload = {
             ...formData,
-            // Removemos espaços vazios caso existam
             acompanhantes: acompanhantes.filter(a => a.nome.trim() !== '')
         };
 
@@ -86,7 +92,6 @@ export default function InvitePage() {
 
                         <form onSubmit={handleSubmit} className="form-card">
                             
-                            {/* Nome Completo */}
                             <div className="form-group">
                                 <label htmlFor="nome">Nome Completo</label>
                                 <input
@@ -101,7 +106,6 @@ export default function InvitePage() {
                                 />
                             </div>
 
-                            {/* CPF */}
                             <div className="form-group">
                                 <label htmlFor="cpf">CPF</label>
                                 <input
@@ -116,7 +120,6 @@ export default function InvitePage() {
                                 />
                             </div>
 
-                            {/* Telefone e Instagram */}
                             <div className="form-group">
                                 <label htmlFor="telefone">Telefone / WhatsApp</label>
                                 <input
@@ -194,7 +197,7 @@ export default function InvitePage() {
                 </div>
             </div>
 
-            {/* ====== LADO DIREITO: Imagens (Mantido igual) ====== */}
+            {/* ====== LADO DIREITO: Imagens ====== */}
             <div className="right-pane">
                 {IMAGES.map((img, index) => (
                     <div
