@@ -2,7 +2,7 @@ name: CI/CD Pipeline - Cassab solidário
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feat-pipeline-ci-cd"]
   pull_request:
     branches: [ "main" ]
 
