@@ -20,5 +20,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: gh-pages
-          branch: feat-github-pages   
+          branch: gh-pages 
           clean: true
