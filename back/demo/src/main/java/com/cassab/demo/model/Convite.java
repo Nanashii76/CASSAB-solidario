@@ -22,8 +22,12 @@ public class Convite {
 
     private String nome;
     private String cpf;
+    private String email;
     private String telefone;
     private String instagram;
+
+    // String para o código
+    private String codigo;
 
     @OneToMany(mappedBy = "convite", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Acompanhante> acompanhantes = new ArrayList<>();
@@ -52,6 +56,14 @@ public class Convite {
         this.cpf = cpf;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getTelefone() {
         return telefone;
     }
@@ -66,6 +78,14 @@ public class Convite {
 
     public void setInstagram(String instagram) {
         this.instagram = instagram;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public List<Acompanhante> getAcompanhantes() {
