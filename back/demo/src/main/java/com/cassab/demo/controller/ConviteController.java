@@ -31,7 +31,7 @@ public class ConviteController {
         Convite novoConvite = new Convite();
         novoConvite.setNome(dados.nome());
         novoConvite.setCpf(dados.cpf());
-        novoConvite.setEmail(dados.email());
+        novoConvite.setPlacaCarro(dados.placaCarro());
         novoConvite.setTelefone(dados.telefone());
         novoConvite.setInstagram(dados.instagram());
 
