@@ -10,7 +10,7 @@ interface Acompanhante {
 
 interface UserFormData {
     nome: string;
-    email: string;
+    placaCarro: string; 
     cpf: string;
     telefone: string;
     instagram: string;
@@ -29,8 +29,11 @@ const IMAGES = [
 ];
 
 export default function InvitePage() {
-    const [formData, setFormData] = useState<UserFormData>({ nome: '', email: '', cpf: '', telefone: '', instagram: '' });
-    const [errors, setErrors] = useState({ email: '', cpf: '', telefone: '' });
+    // Atualizado estado inicial: sai email, entra placaCarro
+    const [formData, setFormData] = useState<UserFormData>({ nome: '', placaCarro: '', cpf: '', telefone: '', instagram: '' });
+    // Removido erro de email
+    const [errors, setErrors] = useState({ cpf: '', telefone: '' });
+    
     const [acompanhantes, setAcompanhantes] = useState<Acompanhante[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [conviteGerado, setConviteGerado] = useState<ConviteResponse | null>(null);
@@ -62,10 +65,6 @@ export default function InvitePage() {
             .replace(/(-\d{4})\d+?$/, '$1');
     };
 
-    const validateEmail = (email: string) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    };
-
     // --- HANDLERS ---
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +81,10 @@ export default function InvitePage() {
             if (finalValue.length >= 14) setErrors(prev => ({...prev, telefone: ''}));
         }
 
-        if (name === 'email') setErrors(prev => ({...prev, email: ''}));
+        // Formata a placa para maiúsculo automaticamente
+        if (name === 'placaCarro') {
+            finalValue = value.toUpperCase();
+        }
 
         setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
@@ -96,19 +98,19 @@ export default function InvitePage() {
 
     const handleReset = () => {
         setConviteGerado(null);
-        setFormData({ nome: '', email: '', cpf: '', telefone: '', instagram: '' });
+        // Reseta placaCarro
+        setFormData({ nome: '', placaCarro: '', cpf: '', telefone: '', instagram: '' });
         setAcompanhantes([]);
-        setErrors({ email: '', cpf: '', telefone: '' });
+        setErrors({ cpf: '', telefone: '' });
     };
 
-    // --- DOWNLOAD DO TICKET CORRIGIDO ---
+    // --- DOWNLOAD DO TICKET ---
     const handleDownloadTicket = async () => {
         const element = document.getElementById('ticket-capture');
         if (element) {
-            // backgroundColor: '#ffffff' FORÇA O FUNDO BRANCO
             const canvas = await html2canvas(element, { 
                 backgroundColor: '#ffffff',
-                scale: 2 // Melhora a qualidade da imagem
+                scale: 2 
             });
             const data = canvas.toDataURL('image/png');
             
@@ -124,13 +126,10 @@ export default function InvitePage() {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         
-        const newErrors = { email: '', cpf: '', telefone: '' };
+        // Remove validação de email, mantém apenas as obrigatórias
+        const newErrors = { cpf: '', telefone: '' };
         let hasError = false;
 
-        if (!validateEmail(formData.email)) {
-            newErrors.email = "E-mail inválido.";
-            hasError = true;
-        }
         if (formData.cpf.length < 14) {
             newErrors.cpf = "CPF incompleto.";
             hasError = true;
@@ -183,7 +182,6 @@ export default function InvitePage() {
                                 Seu ingresso está pronto! 🎉
                             </h2>
                             
-                            {/* O 'ticket-capture' agora tem um estilo inline para garantir fundo branco na captura */}
                             <div id="ticket-capture" style={{ background: '#fff', padding: '20px', borderRadius: '10px' }}>
                                 <div className="ticket-card">
                                     <div className="ticket-header">
@@ -234,12 +232,20 @@ export default function InvitePage() {
                                             value={formData.nome} onChange={handleInputChange} required disabled={isLoading} />
                                     </div>
 
+                                    {/* CAMPO NOVO: Placa do Carro (Opcional) */}
                                     <div className="form-group">
-                                        <label htmlFor="email">E-mail</label>
-                                        <input id="email" name="email" type="email" placeholder="seu@email.com" 
-                                            className={`input-field ${errors.email ? 'input-error' : ''}`}
-                                            value={formData.email} onChange={handleInputChange} required disabled={isLoading} />
-                                        {errors.email && <span className="error-msg">{errors.email}</span>}
+                                        <label htmlFor="placaCarro">Placa do Carro (Opcional)</label>
+                                        <input 
+                                            id="placaCarro" 
+                                            name="placaCarro" 
+                                            type="text" 
+                                            placeholder="ABC1234" 
+                                            className="input-field"
+                                            value={formData.placaCarro} 
+                                            onChange={handleInputChange} 
+                                            // Removido required e erros, pois é opcional
+                                            disabled={isLoading} 
+                                        />
                                     </div>
 
                                     <div className="form-group">
