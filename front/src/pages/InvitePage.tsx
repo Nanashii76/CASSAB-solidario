@@ -1,5 +1,5 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
-import '../styles/invitePage.css'
+import '../styles/invitePage.css';
 
 interface Acompanhante {
     nome: string;
@@ -20,6 +20,7 @@ const IMAGES = [
 ];
 
 export default function InvitePage() {
+    // Estado dos dados do titular
     const [formData, setFormData] = useState<UserFormData>({
         nome: '',
         cpf: '',
@@ -27,12 +28,16 @@ export default function InvitePage() {
         instagram: ''
     });
 
-
+    // Estado da lista de acompanhantes
     const [acompanhantes, setAcompanhantes] = useState<Acompanhante[]>([]);
+
+    // Estado de carregamento (feedback visual para o usuário)
+    const [isLoading, setIsLoading] = useState(false);
 
     // Estado do Carrossel
     const [currentImage, setCurrentImage] = useState(0);
 
+    // Roda o carrossel automaticamente
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImage((prev) => (prev + 1) % IMAGES.length);
@@ -40,12 +45,13 @@ export default function InvitePage() {
         return () => clearInterval(interval);
     }, []);
 
-    // Tipagem do evento de mudança de input (ChangeEvent)
+    // Atualiza os inputs do titular
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // Funções de manipulação de acompanhantes
     const addAcompanhante = () => {
         setAcompanhantes([...acompanhantes, { nome: '', sobrenome: '' }]);
     };
@@ -63,16 +69,45 @@ export default function InvitePage() {
         }
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    // ENVIO DO FORMULÁRIO (INTEGRADO COM BACKEND)
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setIsLoading(true); // Bloqueia o botão e mostra loading
         
+        // Prepara o JSON removendo acompanhantes vazios se houver
         const payload = {
             ...formData,
             acompanhantes: acompanhantes.filter(a => a.nome.trim() !== '')
         };
 
-        console.log("JSON PARA O BACKEND:", JSON.stringify(payload, null, 2));
-        alert("JSON gerado no console! (F12)");
+        try {
+            // Chama o seu Backend Spring Boot
+            // Se estiver rodando em outra porta ou URL, altere aqui
+            const response = await fetch('http://localhost:8080/api/convites/criar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert("Convite gerado com sucesso! 🎉");
+                
+                // Limpa o formulário após o sucesso
+                setFormData({ nome: '', cpf: '', telefone: '', instagram: '' });
+                setAcompanhantes([]);
+            } else {
+                alert("Erro ao salvar. Verifique os dados e tente novamente.");
+                console.error("Erro no servidor:", response.status);
+            }
+
+        } catch (error) {
+            console.error("Erro de conexão:", error);
+            alert("Não foi possível conectar ao servidor. O Backend está rodando?");
+        } finally {
+            setIsLoading(false); // Libera o botão novamente
+        }
     };
 
     return (
@@ -103,6 +138,7 @@ export default function InvitePage() {
                                     value={formData.nome}
                                     onChange={handleInputChange}
                                     required
+                                    disabled={isLoading}
                                 />
                             </div>
 
@@ -117,6 +153,7 @@ export default function InvitePage() {
                                     value={formData.cpf}
                                     onChange={handleInputChange}
                                     required
+                                    disabled={isLoading}
                                 />
                             </div>
 
@@ -131,6 +168,7 @@ export default function InvitePage() {
                                     value={formData.telefone}
                                     onChange={handleInputChange}
                                     required
+                                    disabled={isLoading}
                                 />
                             </div>
 
@@ -144,6 +182,7 @@ export default function InvitePage() {
                                     className="input-field"
                                     value={formData.instagram}
                                     onChange={handleInputChange}
+                                    disabled={isLoading}
                                 />
                             </div>
 
@@ -163,6 +202,7 @@ export default function InvitePage() {
                                                 value={item.nome}
                                                 onChange={(e) => handleAcompanhanteChange(index, 'nome', e.target.value)}
                                                 required
+                                                disabled={isLoading}
                                             />
                                             <input
                                                 type="text"
@@ -171,6 +211,7 @@ export default function InvitePage() {
                                                 value={item.sobrenome}
                                                 onChange={(e) => handleAcompanhanteChange(index, 'sobrenome', e.target.value)}
                                                 required
+                                                disabled={isLoading}
                                             />
                                         </div>
                                         <button 
@@ -178,19 +219,30 @@ export default function InvitePage() {
                                             onClick={() => removeAcompanhante(index)}
                                             className="btn-remove"
                                             title="Remover"
+                                            disabled={isLoading}
                                         >
                                             &times;
                                         </button>
                                     </div>
                                 ))}
 
-                                <button type="button" onClick={addAcompanhante} className="btn-add">
+                                <button 
+                                    type="button" 
+                                    onClick={addAcompanhante} 
+                                    className="btn-add"
+                                    disabled={isLoading}
+                                >
                                     + Adicionar Acompanhante
                                 </button>
                             </div>
 
-                            <button type="submit" className="btn-submit">
-                                GERAR MEU CONVITE
+                            <button 
+                                type="submit" 
+                                className="btn-submit"
+                                disabled={isLoading}
+                                style={{ opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'wait' : 'pointer' }}
+                            >
+                                {isLoading ? 'ENVIANDO...' : 'GERAR MEU CONVITE'}
                             </button>
                         </form>
                     </main>
