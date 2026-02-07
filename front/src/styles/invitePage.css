@@ -398,3 +398,167 @@ body {
   color: var(--primary-color);
   background-color: #eff6ff;
 }
+
+/* ... (Mantenha o CSS do Split Screen e do Form igual) ... */
+
+/* ================= TICKET PREMIUM (ESTILO INGRESSO) ================= */
+.ticket-wrapper {
+  perspective: 1000px;
+  margin-bottom: 2rem;
+}
+
+/* O ID que vamos usar para gerar a imagem precisa ter fundo branco fixo */
+#ticket-capture {
+  background-color: transparent; 
+  padding: 10px; /* Margem de respiro para o print não cortar sombra */
+}
+
+.ticket-card {
+  background: white;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Topo do Ticket (Degradê Moderno) */
+.ticket-header {
+  background: linear-gradient(135deg, #2563eb, #7c3aed); /* Azul para Roxo */
+  padding: 2.5rem 2rem;
+  text-align: center;
+  color: white;
+  position: relative;
+  /* Efeito de semi-círculos na base (picote) */
+  mask-image: radial-gradient(circle at bottom, transparent 10px, black 11px);
+  mask-size: 100% 51%;
+  mask-position: bottom;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: radial-gradient(circle at bottom, transparent 10px, black 11px);
+  -webkit-mask-size: 100% 51%;
+  -webkit-mask-position: bottom;
+  -webkit-mask-repeat: no-repeat;
+  padding-bottom: 3.5rem; /* Espaço para o picote */
+}
+
+.ticket-event-name {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.ticket-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+/* Corpo do Ticket */
+.ticket-body {
+  padding: 1rem 2rem 2rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* O QR Code Container */
+.qr-container {
+  background: white;
+  padding: 15px;
+  border-radius: 15px;
+  border: 2px dashed #e5e7eb;
+  margin-top: -40px; /* Sobe para encostar no header */
+  z-index: 10;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.ticket-code {
+  background: #f3f4f6;
+  color: #374151;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 1.5rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  letter-spacing: 3px;
+}
+
+.ticket-divider {
+  width: 100%;
+  height: 1px;
+  background-image: linear-gradient(to right, #e5e7eb 50%, transparent 50%);
+  background-size: 10px 1px;
+  background-repeat: repeat-x;
+}
+
+.ticket-guest-info h4 {
+  color: #9ca3af;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.ticket-guest-info p {
+  color: #111827;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Botão de Download */
+.btn-download {
+  background-color: #10b981; /* Verde */
+  color: white;
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+}
+
+.btn-download:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+}
+
+.btn-new {
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Validação Erro */
+.error-msg {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+  text-align: left;
+  font-weight: 600;
+}
+
+.input-error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
