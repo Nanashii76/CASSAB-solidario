@@ -1,6 +1,7 @@
 package com.cassab.demo.controller;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class ConviteController {
         Convite novoConvite = new Convite();
         novoConvite.setNome(dados.nome());
         novoConvite.setCpf(dados.cpf());
+        novoConvite.setPlacaCarro(dados.placaCarro());
         novoConvite.setTelefone(dados.telefone());
         novoConvite.setInstagram(dados.instagram());
 
@@ -45,10 +47,13 @@ public class ConviteController {
             novoConvite.setAcompanhantes(listaAcompanhantes);
         }
 
+        // Gerar código
+        String codigoGerado = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        novoConvite.setCodigo(codigoGerado);
+    
         Convite conviteSalvo = conviteRepository.save(novoConvite);
         return ResponseEntity.ok(conviteSalvo);
     }
-    
     
 
 }

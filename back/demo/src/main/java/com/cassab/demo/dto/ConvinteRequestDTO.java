@@ -7,5 +7,6 @@ public record ConvinteRequestDTO(
     String cpf,
     String telefone,
     String instagram,
+    String placaCarro,
     List<AcompanhanteDTO> acompanhantes 
 ) {}
