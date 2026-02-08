@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import '../styles/adminPage.css'; 
 
-// ⚠️ SEU LINK DO NGROK OU LOCALHOST
-const API_URL = 'http://localhost:8080'; 
+const URL = import.meta.env.VITE_API_URL || "http://localhost:8080"; 
 
 interface Acompanhante {
     nome: string;
@@ -43,7 +42,7 @@ export default function AdminPage() {
 
     const fetchConvites = async () => {
         try {
-            const res = await fetch(`${API_URL}/api/convites`);
+            const res = await fetch(`${URL}/api/convites`);
             if (res.ok) {
                 const data = await res.json();
                 setConvites(data);
@@ -73,7 +72,7 @@ export default function AdminPage() {
         setShowCamera(false);
 
         try {
-            const res = await fetch(`${API_URL}/api/convites/checkin/${codigo}`, {
+            const res = await fetch(`${URL}/api/convites/checkin/${codigo}`, {
                 method: 'POST'
             });
 

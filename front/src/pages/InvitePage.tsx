@@ -13,6 +13,7 @@ import img6 from '../assets/Carrossel/Imagem 6º.jpg';
 
 // Lista para o Carrossel
 const IMAGES = [img1, img3, img4, img5, img6];
+const URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 interface Acompanhante {
     nome: string;
@@ -165,7 +166,7 @@ export default function InvitePage() {
         try {
             // Mude para o seu link do NGROK se for testar no celular
             // Exemplo: 'https://seu-ngrok.app/api/convites'
-            const response = await fetch('http://localhost:8080/api/convites/criar', {
+            const response = await fetch(`${URL}/api/convites/criar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
