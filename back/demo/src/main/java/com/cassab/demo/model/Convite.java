@@ -36,6 +36,9 @@ public class Convite {
     @Column(nullable = true)
     private String placaCarro;
 
+    @Column(nullable = false)
+    private boolean usado = false;
+
     // String para o código
     private String codigo;
 
@@ -88,6 +91,14 @@ public class Convite {
 
     public void setPlacaCarro(String placaCarro) {
         this.placaCarro = placaCarro;
+    }
+
+    public boolean getUsado() {
+        return usado;
+    }
+
+    public void setUsado(boolean usado) {
+        this.usado = usado;
     }
 
     public String getCodigo() {
