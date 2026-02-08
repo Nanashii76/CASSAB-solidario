@@ -1,564 +1,158 @@
-:root {
-  /* Paleta de Cores (Baseada no Tailwind) */
-  --primary-color: #2563eb; /* Blue 600 */
-  --primary-hover: #1d4ed8; /* Blue 700 */
-  --bg-color: #f9fafb;      /* Gray 50 */
-  --card-bg: #ffffff;
-  --text-main: #111827;     /* Gray 900 */
-  --text-secondary: #6b7280;/* Gray 500 */
-  --border-color: #e5e7eb;  /* Gray 200 */
-  --shadow-color: rgba(0, 0, 0, 0.1);
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
+/* RESET BÁSICO */
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-main);
+body, html {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
 }
 
-/* ================= LAYOUT PRINCIPAL (SPLIT SCREEN) ================= */
+/* CONTAINER PRINCIPAL (TELA DIVIDIDA) */
 .split-screen-container {
-  display: flex;
-  flex-direction: column; /* Mobile: Empilhado */
-  min-height: 100vh;
-  width: 100%;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
-/* Desktop: Lado a Lado */
-@media (min-width: 1024px) {
-  .split-screen-container {
-    flex-direction: row;
-  }
-}
+/* ====== LADO ESQUERDO (FORMULÁRIO + FUNDO ANIMADO) ====== */
 
-/* ================= LADO ESQUERDO (FORMULÁRIO) ================= */
 .left-pane {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1.5rem;
+    flex: 1;
+    position: relative; /* Necessário para conter os elementos absolutos */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #111827; /* Cor de fundo de segurança */
+    overflow: hidden; /* Garante que a animação não vaze da tela */
 }
 
-@media (min-width: 1024px) {
-  .left-pane {
-    width: 50%;
-    padding: 4rem;
-  }
+/* --- A MÁGICA DO SCROLL INFINITO --- */
+
+/* O contêiner da imagem de fundo */
+.animated-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    
+    /* TRUQUE DO LOOP: Largura dupla para caber duas imagens lado a lado */
+    width: 200%; 
+    
+    /* Configuração da Imagem */
+    background-size: cover; /* Tenta preencher a altura sem distorcer */
+    background-position: left center;
+    background-repeat: repeat-x; /* Repete a imagem horizontalmente */
+    
+    z-index: 0;
+    
+    /* Configuração da Animação: Nome | Duração | Velocidade Constante | Infinito */
+    animation: moveBackground 40s linear infinite;
+    /* Dica: Aumente o 40s para 60s ou 80s se quiser mais lento */
 }
 
+/* DEFINIÇÃO DO MOVIMENTO (Deslizar para esquerda) */
+@keyframes moveBackground {
+    0% {
+        transform: translateX(0); /* Começa na posição inicial */
+    }
+    100% {
+        /* Move para a esquerda exatamente metade da sua largura total (que é 200%) */
+        transform: translateX(-50%); 
+    }
+}
+
+/* Camada Escura (Overlay) */
+.bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* 60% de escurecimento */
+    backdrop-filter: blur(2px);      /* Desfoque bem leve */
+    z-index: 1; 
+}
+
+/* O Conteúdo do Formulário (Fica na frente de tudo) */
 .content-wrapper {
-  width: 100%;
-  max-width: 450px;
+    position: relative;
+    z-index: 2; 
+    width: 100%;
+    max-width: 480px;
 }
 
-/* Header */
-.header-section {
-  margin-bottom: 2rem;
-}
+/* ESTILOS DO FORMULÁRIO */
+.header-section { margin-bottom: 2rem; text-align: center; }
+.header-section h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+.header-section p { font-size: 1rem; }
+.form-title { display: block; margin-bottom: 1rem; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.form-card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.9rem; }
+.input-field { width: 100%; padding: 0.85rem 1rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; transition: all 0.2s; }
+.input-field:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); outline: none; }
+.input-error { border-color: #dc2626; background-color: #fef2f2; }
+.error-msg { display: block; margin-top: 0.4rem; color: #dc2626; font-size: 0.8rem; }
+.btn-submit { width: 100%; padding: 1rem; background-color: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: background-color 0.2s; }
+.btn-submit:hover { background-color: #1d4ed8; }
+.companions-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; margin-bottom: 1.5rem; }
+.section-title { display: block; font-weight: 600; margin-bottom: 1rem; color: #374151; }
+.companion-row { display: flex; gap: 0.8rem; margin-bottom: 0.8rem; align-items: center; }
+.companion-inputs { display: flex; gap: 0.8rem; flex: 1; }
+.btn-remove { background: #fee2e2; color: #dc2626; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.btn-remove:hover { background: #fecaca; }
+.btn-add { background: none; border: 1px dashed #9ca3af; color: #6b7280; width: 100%; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+.btn-add:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
 
-.header-section h1 {
-  font-size: 2.25rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--text-main);
-}
+/* ESTILOS DO TICKET (Mantidos) */
+.ticket-wrapper { animation: fadeIn 0.5s ease-out; }
+.ticket-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; }
+.ticket-header { background: #2563eb; color: white; padding: 1.5rem; text-align: center; }
+.ticket-event-name { margin: 0; font-size: 1.4rem; }
+.ticket-subtitle { margin: 0; opacity: 0.9; font-size: 0.9rem; }
+.ticket-body { padding: 2rem; text-align: center; }
+.qr-container { background: #fff; padding: 1rem; display: inline-block; }
+.ticket-code { font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; margin: 1rem 0; color: #111827; }
+.ticket-divider { height: 1px; background: #e5e7eb; margin: 1.5rem 0; }
+.ticket-guest-info h4 { margin: 0; color: #6b7280; font-size: 0.8rem; text-transform: uppercase; }
+.ticket-guest-info p { margin: 0.3rem 0 0; font-size: 1.2rem; font-weight: 700; color: #111827; }
+.btn-download { width: 100%; padding: 1rem; background-color: #059669; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: background-color 0.2s; }
+.btn-download:hover { background-color: #047857; }
 
-.header-section p {
-  margin-top: 0.5rem;
-  font-size: 1.125rem;
-  font-style: italic;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Card do Formulário */
-.form-card {
-  background-color: var(--card-bg);
-  padding: 2rem;
-  border-radius: 2rem; /* Arredondado grande */
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f3f4f6;
-}
-
-.form-title {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #9ca3af;
-  margin-bottom: 1rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #4b5563;
-  margin-bottom: 0.5rem;
-  margin-left: 0.25rem;
-}
-
-.input-field {
-  width: 100%;
-  height: 3.5rem; /* 56px */
-  padding: 0 1.25rem;
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.2s;
-}
-
-.input-field:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-}
-
-/* Controle de Acompanhantes */
-.counter-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem;
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.counter-label {
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #4b5563;
-  margin-left: 0.5rem;
-}
-
-.counter-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background-color: white;
-  padding: 0.25rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.btn-counter {
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  border-radius: 0.375rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-minus { background-color: #f3f4f6; color: #4b5563; }
-.btn-plus { background-color: #dbeafe; color: var(--primary-color); }
-
-.counter-value {
-  font-weight: bold;
-  min-width: 1rem;
-  text-align: center;
-}
-
-/* Botão Principal */
-.btn-submit {
-  width: 100%;
-  height: 3.5rem;
-  background-color: var(--primary-color);
-  color: white;
-  font-size: 1.125rem;
-  font-weight: 800;
-  border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-  transition: transform 0.1s, background-color 0.2s;
-}
-
-.btn-submit:hover {
-  background-color: var(--primary-hover);
-}
-
-.btn-submit:active {
-  transform: scale(0.98);
-}
-
-/* ================= LADO DIREITO (IMAGENS) ================= */
+/* ====== LADO DIREITO (CARROSSEL - MANTIDO IGUAL) ====== */
 .right-pane {
-  /* MOBILE (Padrão) */
-  display: block;      /* Agora aparece no mobile */
-  width: 100%;         /* Ocupa toda a largura */
-  height: 500px;       /* Altura fixa para aparecer no fundo da tela */
-  position: relative;
-  overflow: hidden;
-  background-color: #111827;
+    flex: 1;
+    position: relative;
+    background-color: #000;
 }
+.carousel-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1s ease-in-out; }
+.carousel-slide.active { opacity: 1; }
+.carousel-image { width: 100%; height: 100%; object-fit: cover; }
+.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%); }
+.carousel-content { position: absolute; bottom: 10%; left: 5%; right: 5%; text-align: left; color: white; z-index: 2; }
+.carousel-subtitle { display: inline-block; background: #2563eb; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+.carousel-title { font-size: 2.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+.carousel-desc { font-size: 1.1rem; max-width: 80%; opacity: 0.9; }
+.indicators { position: absolute; bottom: 3%; left: 50%; transform: translateX(-50%); display: flex; gap: 0.6rem; z-index: 2; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); border: none; cursor: pointer; transition: all 0.3s; }
+.dot.active { background: white; transform: scale(1.3); }
 
-/* DESKTOP (Telas grandes) */
-@media (min-width: 1024px) {
-  .right-pane {
-    width: 50%;        /* Volta a dividir a tela */
-    height: auto;      /* Altura automática para preencher 100vh */
-  }
-}
-
-.carousel-slide {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
-}
-
-.carousel-slide.active {
-  opacity: 1;
-}
-
-.carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); /* Um pouco mais escuro para leitura */
-}
-
-/* Ajustes de Texto do Carrossel */
-.carousel-content {
-  position: absolute;
-  bottom: 4rem;      /* Posição no mobile */
-  left: 2rem;        /* Margem menor no mobile */
-  right: 2rem;
-  z-index: 20;
-  color: white;
-}
-
-/* Ajuste fino para Desktop */
-@media (min-width: 1024px) {
-  .carousel-content {
-    bottom: 5rem;
-    left: 4rem;
-    max-width: 28rem;
-  }
-}
-
-.carousel-subtitle {
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #60a5fa;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-.carousel-title {
-  font-size: 2rem; /* Fonte menor no mobile */
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1rem;
-}
-
-@media (min-width: 1024px) {
-  .carousel-title {
-    font-size: 3rem; /* Fonte grande no desktop */
-  }
-}
-
-.carousel-desc {
-  font-size: 1rem;
-  color: #e5e7eb;
-}
-
-/* Indicadores (Bolinhas) */
-.indicators {
-  position: absolute;
-  bottom: 2rem;
-  left: 2rem;
-  z-index: 20;
-  display: flex;
-  gap: 0.5rem;
-}
-
-@media (min-width: 1024px) {
-  .indicators {
-    left: 4rem;
-  }
-}
-
-.dot {
-  height: 0.375rem;
-  border: none;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.3s;
-  background-color: rgba(255, 255, 255, 0.5);
-  width: 0.5rem;
-}
-
-.dot.active {
-  width: 2rem;
-  background-color: white;
-}
-
-/* ================= NOVOS ESTILOS PARA ACOMPANHANTES ================= */
-
-.companions-section {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  border-top: 1px dashed var(--border-color);
-  padding-top: 1.5rem;
-}
-
-.section-title {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 1rem;
-}
-
-.companion-row {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  align-items: flex-start;
-}
-
-.companion-inputs {
-  display: flex;
-  gap: 0.5rem;
-  flex: 1;
-}
-
-/* No mobile, inputs ficam um em cima do outro. No desktop, lado a lado */
-@media (max-width: 640px) {
-  .companion-inputs {
-    flex-direction: column;
-  }
-}
-
-.btn-remove {
-  background: none;
-  border: none;
-  color: #ef4444; /* Vermelho */
-  font-weight: bold;
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  margin-top: 0.25rem; /* Alinhar visualmente com o input */
-}
-
-.btn-remove:hover {
-  color: #b91c1c;
-}
-
-.btn-add {
-  width: 100%;
-  padding: 1rem;
-  background-color: transparent;
-  border: 2px dashed var(--border-color);
-  border-radius: 0.75rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.btn-add:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  background-color: #eff6ff;
-}
-
-/* ... (Mantenha o CSS do Split Screen e do Form igual) ... */
-
-/* ================= TICKET PREMIUM (ESTILO INGRESSO) ================= */
-.ticket-wrapper {
-  perspective: 1000px;
-  margin-bottom: 2rem;
-}
-
-/* O ID que vamos usar para gerar a imagem precisa ter fundo branco fixo */
-#ticket-capture {
-  background-color: transparent; 
-  padding: 10px; /* Margem de respiro para o print não cortar sombra */
-}
-
-.ticket-card {
-  background: white;
-  width: 100%;
-  max-width: 380px;
-  margin: 0 auto;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-/* Topo do Ticket (Degradê Moderno) */
-.ticket-header {
-  background: linear-gradient(135deg, #2563eb, #7c3aed); /* Azul para Roxo */
-  padding: 2.5rem 2rem;
-  text-align: center;
-  color: white;
-  position: relative;
-  /* Efeito de semi-círculos na base (picote) */
-  mask-image: radial-gradient(circle at bottom, transparent 10px, black 11px);
-  mask-size: 100% 51%;
-  mask-position: bottom;
-  mask-repeat: no-repeat;
-  -webkit-mask-image: radial-gradient(circle at bottom, transparent 10px, black 11px);
-  -webkit-mask-size: 100% 51%;
-  -webkit-mask-position: bottom;
-  -webkit-mask-repeat: no-repeat;
-  padding-bottom: 3.5rem; /* Espaço para o picote */
-}
-
-.ticket-event-name {
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: -1px;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.ticket-subtitle {
-  font-size: 0.9rem;
-  opacity: 0.9;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-top: 5px;
-}
-
-/* Corpo do Ticket */
-.ticket-body {
-  padding: 1rem 2rem 2rem 2rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-/* O QR Code Container */
-.qr-container {
-  background: white;
-  padding: 15px;
-  border-radius: 15px;
-  border: 2px dashed #e5e7eb;
-  margin-top: -40px; /* Sobe para encostar no header */
-  z-index: 10;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-}
-
-.ticket-code {
-  background: #f3f4f6;
-  color: #374151;
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
-  font-size: 1.5rem;
-  padding: 0.5rem 1.5rem;
-  border-radius: 8px;
-  letter-spacing: 3px;
-}
-
-.ticket-divider {
-  width: 100%;
-  height: 1px;
-  background-image: linear-gradient(to right, #e5e7eb 50%, transparent 50%);
-  background-size: 10px 1px;
-  background-repeat: repeat-x;
-}
-
-.ticket-guest-info h4 {
-  color: #9ca3af;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-  margin-bottom: 5px;
-}
-
-.ticket-guest-info p {
-  color: #111827;
-  font-weight: 700;
-  font-size: 1.2rem;
-}
-
-/* Botão de Download */
-.btn-download {
-  background-color: #10b981; /* Verde */
-  color: white;
-  width: 100%;
-  padding: 1rem;
-  border: none;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: transform 0.2s, background 0.2s;
-  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
-}
-
-.btn-download:hover {
-  background-color: #059669;
-  transform: translateY(-2px);
-}
-
-.btn-new {
-  margin-top: 1rem;
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-/* Validação Erro */
-.error-msg {
-  color: #ef4444;
-  font-size: 0.75rem;
-  margin-top: 4px;
-  display: block;
-  text-align: left;
-  font-weight: 600;
-}
-
-.input-error {
-  border-color: #ef4444 !important;
-  background-color: #fef2f2 !important;
+/* RESPONSIVIDADE (CELULAR) */
+@media (max-width: 768px) {
+    .split-screen-container { flex-direction: column; height: auto; min-height: 100vh; }
+    .left-pane, .right-pane { flex: none; width: 100%; }
+    /* No celular, o fundo animado pode ficar muito pesado ou estranho, ajustamos a altura */
+    .left-pane { min-height: 100vh; padding: 1.5rem; }
+    .right-pane { height: 50vh; /* O carrossel fica menor no celular */ order: -1; /* Joga o carrossel para cima */ }
+    .carousel-title { font-size: 1.8rem; }
 }

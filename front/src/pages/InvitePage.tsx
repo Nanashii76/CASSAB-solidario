@@ -3,6 +3,17 @@ import QRCode from "react-qr-code";
 import html2canvas from 'html2canvas';
 import '../styles/invitePage.css';
 
+// --- IMPORTS DAS IMAGENS ---
+import img1 from '../assets/Carrossel/Imagem 1º.jpg';
+import img2 from '../assets/Carrossel/imagem 2º.jpeg';
+import img3 from '../assets/Carrossel/Imagem 3º.jpg';
+import img4 from '../assets/Carrossel/Imagem 4º.jpg';
+import img5 from '../assets/Carrossel/Imagem 5º.jpg';
+import img6 from '../assets/Carrossel/Imagem 6º.jpg';
+
+// Lista para o Carrossel
+const IMAGES = [img1, img3, img4, img5, img6];
+
 interface Acompanhante {
     nome: string;
     sobrenome: string;
@@ -10,7 +21,7 @@ interface Acompanhante {
 
 interface UserFormData {
     nome: string;
-    placaCarro: string; 
+    placaCarro: string; // Trocamos email por placa
     cpf: string;
     telefone: string;
     instagram: string;
@@ -22,23 +33,25 @@ interface ConviteResponse {
     codigo: string;
 }
 
-const IMAGES = [
-    "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2070&auto=format&fit=crop"
-];
-
 export default function InvitePage() {
-    // Atualizado estado inicial: sai email, entra placaCarro
-    const [formData, setFormData] = useState<UserFormData>({ nome: '', placaCarro: '', cpf: '', telefone: '', instagram: '' });
-    // Removido erro de email
-    const [errors, setErrors] = useState({ cpf: '', telefone: '' });
+    // Estados do Formulário
+    const [formData, setFormData] = useState<UserFormData>({ 
+        nome: '', 
+        placaCarro: '', 
+        cpf: '', 
+        telefone: '', 
+        instagram: '' 
+    });
     
+    const [errors, setErrors] = useState({ cpf: '', telefone: '' });
     const [acompanhantes, setAcompanhantes] = useState<Acompanhante[]>([]);
+    
+    // Estados de UI
     const [isLoading, setIsLoading] = useState(false);
     const [conviteGerado, setConviteGerado] = useState<ConviteResponse | null>(null);
     const [currentImage, setCurrentImage] = useState(0);
 
+    // Carrossel Automático
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImage((prev) => (prev + 1) % IMAGES.length);
@@ -46,7 +59,7 @@ export default function InvitePage() {
         return () => clearInterval(interval);
     }, []);
 
-    // --- MÁSCARAS ---
+    // --- MÁSCARAS E FORMATAÇÃO ---
 
     const formatCPF = (value: string) => {
         return value
@@ -65,7 +78,7 @@ export default function InvitePage() {
             .replace(/(-\d{4})\d+?$/, '$1');
     };
 
-    // --- HANDLERS ---
+    // --- HANDLERS (Ações) ---
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -81,7 +94,7 @@ export default function InvitePage() {
             if (finalValue.length >= 14) setErrors(prev => ({...prev, telefone: ''}));
         }
 
-        // Formata a placa para maiúsculo automaticamente
+        // Placa sempre Maiúscula
         if (name === 'placaCarro') {
             finalValue = value.toUpperCase();
         }
@@ -91,6 +104,7 @@ export default function InvitePage() {
 
     const addAcompanhante = () => setAcompanhantes([...acompanhantes, { nome: '', sobrenome: '' }]);
     const removeAcompanhante = (index: number) => setAcompanhantes(acompanhantes.filter((_, i) => i !== index));
+    
     const handleAcompanhanteChange = (index: number, field: keyof Acompanhante, value: string) => {
         const novaLista = [...acompanhantes];
         if (novaLista[index]) { novaLista[index][field] = value; setAcompanhantes(novaLista); }
@@ -98,7 +112,6 @@ export default function InvitePage() {
 
     const handleReset = () => {
         setConviteGerado(null);
-        // Reseta placaCarro
         setFormData({ nome: '', placaCarro: '', cpf: '', telefone: '', instagram: '' });
         setAcompanhantes([]);
         setErrors({ cpf: '', telefone: '' });
@@ -109,8 +122,8 @@ export default function InvitePage() {
         const element = document.getElementById('ticket-capture');
         if (element) {
             const canvas = await html2canvas(element, { 
-                backgroundColor: '#ffffff',
-                scale: 2 
+                backgroundColor: '#ffffff', // Garante fundo branco na imagem salva
+                scale: 2 // Melhor qualidade
             });
             const data = canvas.toDataURL('image/png');
             
@@ -126,7 +139,6 @@ export default function InvitePage() {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         
-        // Remove validação de email, mantém apenas as obrigatórias
         const newErrors = { cpf: '', telefone: '' };
         let hasError = false;
 
@@ -146,10 +158,13 @@ export default function InvitePage() {
 
         const payload = {
             ...formData,
+            // Remove acompanhantes vazios se o usuário clicou em adicionar mas não preencheu
             acompanhantes: acompanhantes.filter(a => a.nome.trim() !== '')
         };
 
         try {
+            // Mude para o seu link do NGROK se for testar no celular
+            // Exemplo: 'https://seu-ngrok.app/api/convites'
             const response = await fetch('http://localhost:8080/api/convites/criar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -160,7 +175,7 @@ export default function InvitePage() {
                 const dados: ConviteResponse = await response.json();
                 setConviteGerado(dados);
             } else {
-                alert("Erro ao salvar. Verifique os dados.");
+                alert("Erro ao salvar. Verifique se o CPF já foi cadastrado.");
             }
         } catch (error) {
             console.error(error);
@@ -172,17 +187,31 @@ export default function InvitePage() {
 
     return (
         <div className="split-screen-container">
+            
+            {/* ====== LADO ESQUERDO ====== */}
             <div className="left-pane">
+                
+                {/* 1. Imagem de Fundo (img2) com Animação */}
+                <div 
+                    className="animated-bg" 
+                    style={{ backgroundImage: `url(${img2})` }} 
+                ></div>
+                
+                {/* 2. Camada Escura para o texto aparecer */}
+                <div className="bg-overlay"></div>
+
+                {/* 3. Conteúdo Principal */}
                 <div className="content-wrapper">
                     
-                    {/* ===== TELA DE SUCESSO (INGRESSO) ===== */}
+                    {/* ===== TELA DE SUCESSO (TICKET) ===== */}
                     {conviteGerado ? (
                         <div className="ticket-wrapper">
-                            <h2 style={{textAlign: 'center', marginBottom: '1.5rem', color: '#111827'}}>
+                            <h2 style={{textAlign: 'center', marginBottom: '1.5rem', color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.5)'}}>
                                 Seu ingresso está pronto! 🎉
                             </h2>
                             
-                            <div id="ticket-capture" style={{ background: '#fff', padding: '20px', borderRadius: '10px' }}>
+                            {/* O Ingresso em si (Fundo Branco para scanear fácil) */}
+                            <div id="ticket-capture" style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
                                 <div className="ticket-card">
                                     <div className="ticket-header">
                                         <h3 className="ticket-event-name">Cassab Solidário</h3>
@@ -208,7 +237,7 @@ export default function InvitePage() {
                                     ⬇ Baixar Ingresso (JPG)
                                 </button>
                                 <div style={{textAlign: 'center'}}>
-                                    <button className="btn-new" onClick={handleReset}>
+                                    <button className="btn-new" onClick={handleReset} style={{color: '#fff', textDecoration: 'underline', marginTop: '10px', background: 'none', border: 'none', cursor: 'pointer'}}>
                                         Realizar novo cadastro
                                     </button>
                                 </div>
@@ -218,12 +247,18 @@ export default function InvitePage() {
                         /* ===== TELA DE FORMULÁRIO ===== */
                         <>
                             <header className="header-section">
-                                <h1>Cadastro Solidário</h1>
-                                <p>Preencha os dados corretamente para gerar seu convite.</p>
+                                <h1 style={{color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.8)'}}>
+                                    Cadastro Solidário
+                                </h1>
+                                <p style={{color: '#e5e7eb', textShadow: '0 1px 2px rgba(0,0,0,0.8)'}}>
+                                    Preencha os dados corretamente para gerar seu convite.
+                                </p>
                             </header>
 
                             <main>
-                                <span className="form-title">Dados do Titular</span>
+                                <span className="form-title" style={{color: 'white', display: 'block', marginBottom: '10px'}}>
+                                    Dados do Titular
+                                </span>
 
                                 <form onSubmit={handleSubmit} className="form-card">
                                     <div className="form-group">
@@ -232,7 +267,6 @@ export default function InvitePage() {
                                             value={formData.nome} onChange={handleInputChange} required disabled={isLoading} />
                                     </div>
 
-                                    {/* CAMPO NOVO: Placa do Carro (Opcional) */}
                                     <div className="form-group">
                                         <label htmlFor="placaCarro">Placa do Carro (Opcional)</label>
                                         <input 
@@ -243,7 +277,6 @@ export default function InvitePage() {
                                             className="input-field"
                                             value={formData.placaCarro} 
                                             onChange={handleInputChange} 
-                                            // Removido required e erros, pois é opcional
                                             disabled={isLoading} 
                                         />
                                     </div>
@@ -296,6 +329,7 @@ export default function InvitePage() {
                 </div>
             </div>
 
+            {/* ====== LADO DIREITO (CARROSSEL) ====== */}
             <div className="right-pane">
                 {IMAGES.map((img, index) => (
                     <div key={index} className={`carousel-slide ${index === currentImage ? 'active' : ''}`}>
@@ -303,11 +337,13 @@ export default function InvitePage() {
                         <img src={img} alt={`Slide ${index}`} className="carousel-image" />
                     </div>
                 ))}
+                
                 <div className="carousel-content">
                     <span className="carousel-subtitle">Evento Beneficente</span>
                     <h2 className="carousel-title">Juntos fazemos a diferença.</h2>
                     <p className="carousel-desc">Preencha seus dados para receber o QR Code de acesso.</p>
                 </div>
+                
                 <div className="indicators">
                     {IMAGES.map((_, idx) => (
                         <button key={idx} onClick={() => setCurrentImage(idx)} className={`dot ${idx === currentImage ? 'active' : ''}`} />
