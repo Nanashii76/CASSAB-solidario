@@ -2,6 +2,8 @@ package com.cassab.demo.dto;
 
 import java.util.List;
 
+// comentários de debug
+
 public record ConvinteRequestDTO(
     String nome,
     String cpf,
