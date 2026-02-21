@@ -1,0 +1,15 @@
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/bin/Debug/net8.0/testes_carga
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/bin/Debug/net8.0/testes_carga.deps.json
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/bin/Debug/net8.0/testes_carga.runtimeconfig.json
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/bin/Debug/net8.0/testes_carga.dll
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/bin/Debug/net8.0/testes_carga.pdb
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/testes_carga.GeneratedMSBuildEditorConfig.editorconfig
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/testes_carga.AssemblyInfoInputs.cache
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/testes_carga.AssemblyInfo.cs
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/testes_carga.csproj.CoreCompileInputs.cache
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/testes_carga.sourcelink.json
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/testes_carga.dll
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/refint/testes_carga.dll
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/testes_carga.pdb
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/testes_carga.genruntimeconfig.cache
+/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/Debug/net8.0/ref/testes_carga.dll
