@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "6ccX1F2aFrd9WIQ2uMg1NEV6BPDytoLBqooGloIX9YooSwENTiI+zlknYg6QMGLveNA2RuBDnbKOTzqLjy4MVw==",
+  "success": true,
+  "projectFilePath": "/home/jeffersonr/Documents/CASSAB-solidario/CASSAB-solidario.csproj",
+  "expectedPackageFiles": [
+    "/home/jeffersonr/.nuget/packages/system.io.pipelines/10.0.3/system.io.pipelines.10.0.3.nupkg.sha512",
+    "/home/jeffersonr/.nuget/packages/system.net.http.json/10.0.3/system.net.http.json.10.0.3.nupkg.sha512",
+    "/home/jeffersonr/.nuget/packages/system.text.encodings.web/10.0.3/system.text.encodings.web.10.0.3.nupkg.sha512",
+    "/home/jeffersonr/.nuget/packages/system.text.json/10.0.3/system.text.json.10.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

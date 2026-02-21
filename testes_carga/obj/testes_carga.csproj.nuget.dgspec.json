@@ -1,0 +1,61 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/testes_carga.csproj": {}
+  },
+  "projects": {
+    "/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/testes_carga.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/testes_carga.csproj",
+        "projectName": "testes_carga",
+        "projectPath": "/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/testes_carga.csproj",
+        "packagesPath": "/home/jeffersonr/.nuget/packages/",
+        "outputPath": "/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/jeffersonr/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.124/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
