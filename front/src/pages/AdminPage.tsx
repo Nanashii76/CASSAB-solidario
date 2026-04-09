@@ -7,7 +7,8 @@ const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS;
 
 interface Acompanhante {
     nome: string;
-    sobrenome: string;
+    sobrenome?: string;
+    cpf?: string;
 }
 
 interface Convite {
@@ -83,9 +84,10 @@ export default function AdminPage() {
             (c.placaCarro && c.placaCarro.toLowerCase().includes(term));
 
         // 2. Verifica se bate com algum Acompanhante
-        const matchAcompanhante = c.acompanhantes.some(a => 
-            (a.nome + ' ' + a.sobrenome).toLowerCase().includes(term)
-        );
+        const matchAcompanhante = c.acompanhantes.some(a => {
+            const full = ((a.nome || '') + ' ' + (a.sobrenome || '')).trim().toLowerCase();
+            return full.includes(term);
+        });
 
         // 3. Aplica o filtro da Aba (Pendentes vs Presentes)
         const statusMatch = activeTab === 'pendentes' ? !c.usado : c.usado;
@@ -199,9 +201,10 @@ export default function AdminPage() {
                 <div className="list-content">
                     {listaFiltrada.map(convite => {
                         // Lógica visual: Verifica se a busca deu match em algum acompanhante específico
-                        const foundGuest = searchTerm && convite.acompanhantes.find(a => 
-                            (a.nome + ' ' + a.sobrenome).toLowerCase().includes(searchTerm.toLowerCase())
-                        );
+                        const foundGuest = searchTerm && convite.acompanhantes.find(a => {
+                            const full = ((a.nome || '') + ' ' + (a.sobrenome || '')).trim().toLowerCase();
+                            return full.includes(searchTerm.toLowerCase());
+                        });
 
                         return (
                             <div key={convite.id} className={`convite-card ${convite.usado ? 'used' : ''}`}>
@@ -225,7 +228,7 @@ export default function AdminPage() {
                                             marginTop: '8px', padding: '4px 8px', backgroundColor: '#fff7ed', 
                                             borderLeft: '3px solid #f59e0b', borderRadius: '4px', fontSize: '0.8rem', color: '#b45309'
                                         }}>
-                                            📍 Acompanhante: <b>{foundGuest.nome} {foundGuest.sobrenome}</b>
+                                            📍 Acompanhante: <b>{((foundGuest?.nome || '') + ' ' + (foundGuest?.sobrenome || '')).trim()}</b>
                                         </div>
                                     )}
                                 </div>
@@ -273,9 +276,10 @@ export default function AdminPage() {
                                 <div style={{marginTop: '1rem', borderTop: '1px solid #ddd', paddingTop: '0.5rem'}}>
                                     <p><strong>Lista de Acompanhantes:</strong></p>
                                     <ul className="modal-guests-list">
-                                        {modal.data.acompanhantes.map((ac, i) => (
-                                            <li key={i}>{ac.nome} {ac.sobrenome}</li>
-                                        ))}
+                                        {modal.data.acompanhantes.map((ac, i) => {
+                                            const full = ((ac.nome || '') + ' ' + (ac.sobrenome || '')).trim();
+                                            return <li key={i}>{full || '-'}</li>;
+                                        })}
                                     </ul>
                                 </div>
                             )}
