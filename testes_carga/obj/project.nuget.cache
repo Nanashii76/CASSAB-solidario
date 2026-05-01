@@ -1,8 +1,41 @@
 {
   "version": 2,
-  "dgSpecHash": "q2Ct1HJV72okPUaRL1rC+Z5JRSRBiW/wAXtLAvL0L401vHiye9kQ8G11TODbc2QrpFkc/2vOpzOeEVMoAmvBjw==",
-  "success": true,
-  "projectFilePath": "/home/jeffersonr/Documents/CASSAB-solidario/testes_carga/testes_carga.csproj",
+  "dgSpecHash": "O5OtrcblDuk=",
+  "success": false,
+  "projectFilePath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "The local source 'C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\' doesn't exist.",
+      "projectPath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
+      "filePath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
+      "targetGraphs": []
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "The local source 'C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\' doesn't exist.",
+      "projectPath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
+      "filePath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
+      "targetGraphs": []
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "The local source 'C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\' doesn't exist.",
+      "projectPath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
+      "filePath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
+      "targetGraphs": []
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "The local source 'C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\' doesn't exist.",
+      "projectPath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
+      "filePath": "G:\\CASSAB-solidario\\testes_carga\\testes_carga.csproj",
+      "targetGraphs": []
+    }
+  ]
 }
