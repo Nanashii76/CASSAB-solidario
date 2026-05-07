@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.HttpStatus;
+import org.springframework.dao.DataIntegrityViolationException;
 
 
 @Controller
@@ -30,25 +32,40 @@ public class ConviteController {
     @Autowired
     private ConviteRepository conviteRepository;
 
+    // Removido: não usar novo arquivo de repositório
+
     @GetMapping
     public ResponseEntity<List<Convite>> listarTodos() {
         return ResponseEntity.ok(conviteRepository.findAll());  
     }
     
     @PostMapping("/criar")
-    public ResponseEntity<Convite> criarConvite(@RequestBody ConvinteRequestDTO dados) {
+    public ResponseEntity<?> criarConvite(@RequestBody ConvinteRequestDTO dados) {
+        // Normaliza CPF do titular (somente dígitos) para checagem e armazenamento
+        String cpfTitularDigits = dados.cpf() != null ? dados.cpf().replaceAll("\\D", "") : null;
+        // Validar unicidade do CPF do titular
+        if (cpfTitularDigits != null && conviteRepository.existsByCpf(cpfTitularDigits)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("CPF do titular já cadastrado.");
+        }
+
         Convite novoConvite = new Convite();
         novoConvite.setNome(dados.nome());
-        novoConvite.setCpf(dados.cpf());
+        novoConvite.setCpf(cpfTitularDigits);
         novoConvite.setPlacaCarro(dados.placaCarro());
         novoConvite.setTelefone(dados.telefone());
         novoConvite.setInstagram(dados.instagram());
 
         if (dados.acompanhantes() != null) {
             List<Acompanhante> listaAcompanhantes = dados.acompanhantes().stream().map(dto -> {
+                // Validação: CPF do acompanhante não pode ser igual ao do titular
+                String cpfAcompDigits = dto.cpf() != null ? dto.cpf().replaceAll("\\D", "") : null;
+                if (cpfAcompDigits != null && cpfTitularDigits != null && cpfAcompDigits.equals(cpfTitularDigits)) {
+                    throw new IllegalArgumentException("CPF do acompanhante não pode ser igual ao do titular.");
+                }
                 Acompanhante a = new Acompanhante();
                 a.setNome(dto.nome());
                 a.setSobrenome(dto.sobrenome());
+                a.setCpf(cpfAcompDigits);
                 a.setConvite(novoConvite);
                 return a;
             }).collect(Collectors.toList());
@@ -60,8 +77,15 @@ public class ConviteController {
         String codigoGerado = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         novoConvite.setCodigo(codigoGerado);
     
-        Convite conviteSalvo = conviteRepository.save(novoConvite);
-        return ResponseEntity.ok(conviteSalvo);
+        try {
+            Convite conviteSalvo = conviteRepository.save(novoConvite);
+            return ResponseEntity.ok(conviteSalvo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            // Violações de UNIQUE em cpf (titular ou acompanhante)
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("CPF já cadastrado.");
+        }
     }
 
     @PostMapping("/checkin/{codigo}")

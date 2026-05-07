@@ -93,6 +93,7 @@ body, html {
 .header-section { margin-bottom: 2rem; text-align: center; }
 .header-section h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
 .header-section p { font-size: 1rem; }
+.header-logo { width: 306px; height: auto; display: block; margin: 0 auto 0.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
 .form-title { display: block; margin-bottom: 1rem; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .form-card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
 .form-group { margin-bottom: 1.2rem; }
@@ -155,4 +156,5 @@ body, html {
     .left-pane { min-height: 100vh; padding: 1.5rem; }
     .right-pane { height: 50vh; /* O carrossel fica menor no celular */ order: -1; /* Joga o carrossel para cima */ }
     .carousel-title { font-size: 1.8rem; }
+    .header-logo { width: 282px; }
 }

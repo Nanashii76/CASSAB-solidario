@@ -10,6 +10,7 @@ import img3 from '../assets/Carrossel/Imagem 3º.jpg';
 import img4 from '../assets/Carrossel/Imagem 4º.jpg';
 import img5 from '../assets/Carrossel/Imagem 5º.jpg';
 import img6 from '../assets/Carrossel/Imagem 6º.jpg';
+import miniCassab from '../assets/MiniaturaIcon.png';
 
 // Lista para o Carrossel
 const IMAGES = [img1, img3, img4, img5, img6];
@@ -17,11 +18,11 @@ const URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 interface Acompanhante {
     nome: string;
-    sobrenome: string;
+    cpf: string;
 }
 
 interface UserFormData {
-    nome: string;
+    nomeCompleto: string;
     placaCarro: string; // Trocamos email por placa
     cpf: string;
     telefone: string;
@@ -37,7 +38,7 @@ interface ConviteResponse {
 export default function InvitePage() {
     // Estados do Formulário
     const [formData, setFormData] = useState<UserFormData>({ 
-        nome: '', 
+        nomeCompleto: '', 
         placaCarro: '', 
         cpf: '', 
         telefone: '', 
@@ -103,17 +104,20 @@ export default function InvitePage() {
         setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
 
-    const addAcompanhante = () => setAcompanhantes([...acompanhantes, { nome: '', sobrenome: '' }]);
+    const addAcompanhante = () => setAcompanhantes([...acompanhantes, { nome: '', cpf: '' }]);
     const removeAcompanhante = (index: number) => setAcompanhantes(acompanhantes.filter((_, i) => i !== index));
     
     const handleAcompanhanteChange = (index: number, field: keyof Acompanhante, value: string) => {
         const novaLista = [...acompanhantes];
+        if (field === 'cpf') {
+            value = formatCPF(value);
+        }
         if (novaLista[index]) { novaLista[index][field] = value; setAcompanhantes(novaLista); }
     };
 
     const handleReset = () => {
         setConviteGerado(null);
-        setFormData({ nome: '', placaCarro: '', cpf: '', telefone: '', instagram: '' });
+        setFormData({ nomeCompleto: '', placaCarro: '', cpf: '', telefone: '', instagram: '' });
         setAcompanhantes([]);
         setErrors({ cpf: '', telefone: '' });
     };
@@ -152,15 +156,62 @@ export default function InvitePage() {
             hasError = true;
         }
 
+        // Valida acompanhantes: nome e CPF obrigatórios, CPF com 11 dígitos (14 com máscara),
+        // unicidade entre eles e contra o CPF do titular
+        const acompanhantesValidos = acompanhantes.filter(a => a.nome.trim() !== '' || a.cpf.trim() !== '');
+        const cpfTitularDigits = formData.cpf.replace(/\D/g, '');
+        const cpfsAcompanhantesDigits = acompanhantesValidos.map(a => a.cpf.replace(/\D/g, ''));
+
+        // Regras: se o acompanhante foi iniciado, ambos os campos são obrigatórios
+        for (const a of acompanhantesValidos) {
+            if (a.nome.trim() === '' || a.cpf.trim() === '') {
+                alert('Preencha nome e CPF de todos os acompanhantes adicionados.');
+                hasError = true;
+                break;
+            }
+            if (a.cpf.length < 14) {
+                alert(`CPF do acompanhante "${a.nome}" está incompleto.`);
+                hasError = true;
+                break;
+            }
+        }
+        // Unicidade com titular
+        if (!hasError && cpfsAcompanhantesDigits.includes(cpfTitularDigits)) {
+            alert('CPF de acompanhante não pode ser igual ao CPF do titular.');
+            hasError = true;
+        }
+        // Unicidade entre acompanhantes
+        if (!hasError) {
+            const setCpfs = new Set<string>();
+            for (const d of cpfsAcompanhantesDigits) {
+                if (setCpfs.has(d)) {
+                    alert('Há CPFs repetidos entre os acompanhantes.');
+                    hasError = true;
+                    break;
+                }
+                setCpfs.add(d);
+            }
+        }
+
         setErrors(newErrors);
         if (hasError) return;
 
         setIsLoading(true);
 
         const payload = {
-            ...formData,
+            nome: formData.nomeCompleto,
+            cpf: formData.cpf,
+            telefone: formData.telefone,
+            instagram: formData.instagram,
+            placaCarro: formData.placaCarro,
             // Remove acompanhantes vazios se o usuário clicou em adicionar mas não preencheu
-            acompanhantes: acompanhantes.filter(a => a.nome.trim() !== '')
+            acompanhantes: acompanhantes
+                .filter(a => a.nome.trim() !== '' && a.cpf.trim() !== '')
+                .map(a => ({
+                    nome: a.nome,
+                    sobrenome: '', // Mantém compatibilidade com backend atual
+                    cpf: a.cpf
+                }))
         };
 
         try {
@@ -176,7 +227,8 @@ export default function InvitePage() {
                 const dados: ConviteResponse = await response.json();
                 setConviteGerado(dados);
             } else {
-                alert("Erro ao salvar. Verifique se o CPF já foi cadastrado.");
+                const msg = await response.text();
+                alert(msg || "Erro ao salvar. Verifique se o CPF já foi cadastrado.");
             }
         } catch (error) {
             console.error(error);
@@ -248,6 +300,7 @@ export default function InvitePage() {
                         /* ===== TELA DE FORMULÁRIO ===== */
                         <>
                             <header className="header-section">
+                                <img src={miniCassab} alt="Cassab Solidário" className="header-logo" />
                                 <h1 style={{color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.8)'}}>
                                     Cadastro Solidário
                                 </h1>
@@ -263,9 +316,9 @@ export default function InvitePage() {
 
                                 <form onSubmit={handleSubmit} className="form-card">
                                     <div className="form-group">
-                                        <label htmlFor="nome">Nome Completo</label>
-                                        <input id="nome" name="nome" type="text" placeholder="Seu nome" className="input-field"
-                                            value={formData.nome} onChange={handleInputChange} required disabled={isLoading} />
+                                        <label htmlFor="nomeCompleto">Nome Completo</label>
+                                        <input id="nomeCompleto" name="nomeCompleto" type="text" placeholder="Seu nome" className="input-field"
+                                            value={formData.nomeCompleto} onChange={handleInputChange} required disabled={isLoading} />
                                     </div>
 
                                     <div className="form-group">
@@ -309,10 +362,20 @@ export default function InvitePage() {
                                         {acompanhantes.map((item, index) => (
                                             <div key={index} className="companion-row">
                                                 <div className="companion-inputs">
-                                                    <input type="text" placeholder="Nome" className="input-field"
+                                                    <input type="text" placeholder="Nome do acompanhante" className="input-field"
                                                         value={item.nome} onChange={(e) => handleAcompanhanteChange(index, 'nome', e.target.value)} required disabled={isLoading} />
-                                                    <input type="text" placeholder="Sobrenome" className="input-field"
-                                                        value={item.sobrenome} onChange={(e) => handleAcompanhanteChange(index, 'sobrenome', e.target.value)} required disabled={isLoading} />
+                                                </div>
+                                                <div className="companion-inputs">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="CPF do acompanhante"
+                                                        className="input-field"
+                                                        maxLength={14}
+                                                        value={item.cpf}
+                                                        onChange={(e) => handleAcompanhanteChange(index, 'cpf', e.target.value)}
+                                                        required
+                                                        disabled={isLoading}
+                                                    />
                                                 </div>
                                                 <button type="button" onClick={() => removeAcompanhante(index)} className="btn-remove" disabled={isLoading}>&times;</button>
                                             </div>

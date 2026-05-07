@@ -1,13 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "6ccX1F2aFrd9WIQ2uMg1NEV6BPDytoLBqooGloIX9YooSwENTiI+zlknYg6QMGLveNA2RuBDnbKOTzqLjy4MVw==",
-  "success": true,
-  "projectFilePath": "/home/jeffersonr/Documents/CASSAB-solidario/CASSAB-solidario.csproj",
-  "expectedPackageFiles": [
-    "/home/jeffersonr/.nuget/packages/system.io.pipelines/10.0.3/system.io.pipelines.10.0.3.nupkg.sha512",
-    "/home/jeffersonr/.nuget/packages/system.net.http.json/10.0.3/system.net.http.json.10.0.3.nupkg.sha512",
-    "/home/jeffersonr/.nuget/packages/system.text.encodings.web/10.0.3/system.text.encodings.web.10.0.3.nupkg.sha512",
-    "/home/jeffersonr/.nuget/packages/system.text.json/10.0.3/system.text.json.10.0.3.nupkg.sha512"
-  ],
-  "logs": []
+  "dgSpecHash": "h3/gjg7Z8EY=",
+  "success": false,
+  "projectFilePath": "G:\\CASSAB-solidario\\CASSAB-solidario.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "The local source 'C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\' doesn't exist.",
+      "projectPath": "G:\\CASSAB-solidario\\CASSAB-solidario.csproj",
+      "filePath": "G:\\CASSAB-solidario\\CASSAB-solidario.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

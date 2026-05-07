@@ -9,4 +9,5 @@ import com.cassab.demo.model.Convite;
 
 public interface ConviteRepository  extends JpaRepository<Convite, UUID>{
     Optional<Convite> findByCodigo(String codigo);
+    boolean existsByCpf(String cpf);
 }
