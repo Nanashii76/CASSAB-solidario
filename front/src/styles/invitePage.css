@@ -25,9 +25,10 @@ body, html {
 
 .left-pane {
     flex: 1;
+    min-height: 0; /* permite encolher dentro do flex e o filho rolar */
     position: relative; /* Necessário para conter os elementos absolutos */
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     padding: 2rem;
     background-color: #111827; /* Cor de fundo de segurança */
@@ -84,9 +85,35 @@ body, html {
 /* O Conteúdo do Formulário (Fica na frente de tudo) */
 .content-wrapper {
     position: relative;
-    z-index: 2; 
+    z-index: 2;
     width: 100%;
     max-width: 480px;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    padding-right: 0.25rem; /* respiro para a barra não colar no conteúdo */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: rgba(15, 23, 42, 0.28) transparent;
+}
+
+.content-wrapper::-webkit-scrollbar {
+    width: 5px;
+}
+
+.content-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.22);
+    border-radius: 999px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 23, 42, 0.38);
 }
 
 /* ESTILOS DO FORMULÁRIO */
@@ -153,7 +180,11 @@ body, html {
     .split-screen-container { flex-direction: column; height: auto; min-height: 100vh; }
     .left-pane, .right-pane { flex: none; width: 100%; }
     /* No celular, o fundo animado pode ficar muito pesado ou estranho, ajustamos a altura */
-    .left-pane { min-height: 100vh; padding: 1.5rem; }
+    .left-pane {
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 1.5rem;
+    }
     .right-pane { height: 50vh; /* O carrossel fica menor no celular */ order: -1; /* Joga o carrossel para cima */ }
     .carousel-title { font-size: 1.8rem; }
     .header-logo { width: 282px; }
