@@ -3,59 +3,128 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Net.Http.Json;
 
-Random rand = new Random();
+var baseUrl = Environment.GetEnvironmentVariable("CASSAB_API_BASE")?.TrimEnd('/')
+    ?? "http://localhost:8080/api/convites";
+var runCheckin = string.Equals(
+    Environment.GetEnvironmentVariable("CASSAB_RUN_CHECKIN"),
+    "1",
+    StringComparison.OrdinalIgnoreCase);
 
-var baseUrl = "https://cassab-solidario.onrender.com/api/convites";
+if (!int.TryParse(Environment.GetEnvironmentVariable("CASSAB_CREATE_COUNT"), out var total) || total < 1)
+    total = 10;
+
+if (!int.TryParse(Environment.GetEnvironmentVariable("CASSAB_ACOMPANHANTES_COUNT"), out var acompPorConvite) || acompPorConvite < 0)
+    acompPorConvite = 15;
+
 using var client = new HttpClient();
 client.Timeout = TimeSpan.FromMinutes(5);
 var codigosGerados = new List<string>();
 
-Console.WriteLine("--- FASE 1: CRIANDO 50 CONVITES ---");
+var rnd = Random.Shared;
+var cpfsUsados = new HashSet<string>();
 
-for (int i = 0; i < 500; i++)
+// CPF aleatório com dígitos verificadores válidos; único entre titulares e acompanhantes
+string NovoCpfAleatorio()
 {
-    var dados = new { 
-        usado = false,
-        nome = $"User Teste {i}", 
-        cpf = rand.Next(100000000, 999999999).ToString() + i.ToString("D2"), 
-        placaCarro = $"ABC-{rand.Next(100, 9999)}",
-        telefone = "6199999999",
-        instagram = "@cassab",
-        acompanhantes = new List<object>() 
-    };
-    
-    var response = await client.PostAsJsonAsync($"{baseUrl}/criar", dados);
-    
-    if (!response.IsSuccessStatusCode) {
-        var erroBody = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("ERRO NO JAVA: " + erroBody);
-        return; 
-    }
-    
-    var jsonString = await response.Content.ReadAsStringAsync();
-    using var doc = JsonDocument.Parse(jsonString);
-    
-    // O 'codigo' é o identificador único (Chave Primária) do convite
-    var codigo = doc.RootElement.GetProperty("codigo").GetString();
-
-    if (!string.IsNullOrEmpty(codigo)) 
+    Span<int> n = stackalloc int[9];
+    Span<char> ch = stackalloc char[11];
+    while (true)
     {
-        codigosGerados.Add(codigo);
-        Console.WriteLine("Sucesso ao criar ID: " + codigo);
-        // Adicione isso logo após o codigosGerados.Add(codigo);
-        Console.WriteLine($"Progresso: {i + 1}/50 - ID: {codigo}");
+        for (var j = 0; j < 9; j++) n[j] = rnd.Next(0, 10);
+
+        var soma = 0;
+        for (var j = 0; j < 9; j++) soma += n[j] * (10 - j);
+        var resto = soma % 11;
+        var d1 = resto < 2 ? 0 : 11 - resto;
+
+        soma = 0;
+        for (var j = 0; j < 9; j++) soma += n[j] * (11 - j);
+        soma += d1 * 2;
+        resto = soma % 11;
+        var d2 = resto < 2 ? 0 : 11 - resto;
+
+        for (var j = 0; j < 9; j++) ch[j] = (char)('0' + n[j]);
+        ch[9] = (char)('0' + d1);
+        ch[10] = (char)('0' + d2);
+        var digits = new string(ch);
+
+        if (cpfsUsados.Add(digits))
+            return digits;
     }
 }
 
-Console.WriteLine("--- FASE 2: DISPARANDO CHECK-IN (CARGA) ---");
-var stopwatch = Stopwatch.StartNew();
+Console.WriteLine($"--- Criando {total} convite(s) com {acompPorConvite} acompanhante(s) cada em {baseUrl} ---");
+Console.WriteLine("--- CPFs: aleatórios (válidos) e únicos no lote ---");
 
-// Usamos o código (Chave Primária) para vincular cada check-in ao registro certo
+for (int i = 0; i < total; i++)
+{
+    var cpfTitular = NovoCpfAleatorio();
+    var acompanhantes = new List<object>();
+    for (int a = 0; a < acompPorConvite; a++)
+    {
+        acompanhantes.Add(new
+        {
+            nome = $"Acomp {(i + 1):D2}",
+            sobrenome = $"Pessoa {a + 1:D2}",
+            cpf = NovoCpfAleatorio()
+        });
+    }
+
+    var dados = new
+    {
+        nome = $"User Teste Carga {i + 1}",
+        cpf = cpfTitular,
+        placaCarro = $"TST-{1000 + i:D4}",
+        telefone = $"6199999{i % 1000:D4}",
+        instagram = "@cassab_carga",
+        acompanhantes
+    };
+
+    HttpResponseMessage response;
+    try
+    {
+        response = await client.PostAsJsonAsync($"{baseUrl}/criar", dados);
+    }
+    catch (HttpRequestException ex)
+    {
+        Console.WriteLine($"Sem conexão com a API ({baseUrl}). Suba o Spring Boot e o PostgreSQL, depois tente de novo.");
+        Console.WriteLine($"Detalhe: {ex.Message}");
+        Environment.ExitCode = 1;
+        return;
+    }
+
+    if (!response.IsSuccessStatusCode)
+    {
+        var erroBody = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"ERRO ({response.StatusCode}): {erroBody}");
+        Environment.ExitCode = 1;
+        return;
+    }
+
+    var jsonString = await response.Content.ReadAsStringAsync();
+    using var doc = JsonDocument.Parse(jsonString);
+    var codigo = doc.RootElement.GetProperty("codigo").GetString();
+    var nAcomp = doc.RootElement.TryGetProperty("acompanhantes", out var el) && el.ValueKind == JsonValueKind.Array
+        ? el.GetArrayLength()
+        : 0;
+
+    if (!string.IsNullOrEmpty(codigo))
+    {
+        codigosGerados.Add(codigo);
+        Console.WriteLine($"[{i + 1}/{total}] OK codigo={codigo} acompanhantes={nAcomp}");
+    }
+}
+
+Console.WriteLine($"Concluído: {codigosGerados.Count} convite(s) criado(s).");
+
+if (!runCheckin || codigosGerados.Count == 0)
+    return;
+
+Console.WriteLine("--- Check-in em lote (CASSAB_RUN_CHECKIN=1) ---");
+var stopwatch = Stopwatch.StartNew();
 var tarefas = codigosGerados.Select(codigo => client.PostAsync($"{baseUrl}/checkin/{codigo}", null));
 var resultados = await Task.WhenAll(tarefas);
-
 stopwatch.Stop();
 
 var sucessos = resultados.Count(r => r.IsSuccessStatusCode);
-Console.WriteLine("Resultado: " + sucessos + "/50 check-ins realizados.");
-Console.WriteLine("Tempo total da carga: " + stopwatch.ElapsedMilliseconds + "ms");
+Console.WriteLine($"Check-ins OK: {sucessos}/{codigosGerados.Count} em {stopwatch.ElapsedMilliseconds} ms");

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -37,6 +38,12 @@ public class ConviteController {
     @GetMapping
     public ResponseEntity<List<Convite>> listarTodos() {
         return ResponseEntity.ok(conviteRepository.findAll());  
+    }
+
+    @DeleteMapping("/limpar-banco")
+    public ResponseEntity<?> limparBanco() {
+        conviteRepository.deleteAll();
+        return ResponseEntity.ok("Todos os dados foram apagados com sucesso!");
     }
     
     @PostMapping("/criar")

@@ -18,6 +18,7 @@ const URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 interface Acompanhante {
     nome: string;
+    sobrenome: string;
     cpf: string;
 }
 
@@ -104,7 +105,7 @@ export default function InvitePage() {
         setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
 
-    const addAcompanhante = () => setAcompanhantes([...acompanhantes, { nome: '', cpf: '' }]);
+    const addAcompanhante = () => setAcompanhantes([...acompanhantes, { nome: '', sobrenome: '', cpf: '' }]);
     const removeAcompanhante = (index: number) => setAcompanhantes(acompanhantes.filter((_, i) => i !== index));
     
     const handleAcompanhanteChange = (index: number, field: keyof Acompanhante, value: string) => {
@@ -164,8 +165,8 @@ export default function InvitePage() {
 
         // Regras: se o acompanhante foi iniciado, ambos os campos são obrigatórios
         for (const a of acompanhantesValidos) {
-            if (a.nome.trim() === '' || a.cpf.trim() === '') {
-                alert('Preencha nome e CPF de todos os acompanhantes adicionados.');
+            if (a.nome.trim() === '' || a.sobrenome.trim() === '' || a.cpf.trim() === '') {
+                alert('Preencha nome, sobrenome e CPF de todos os acompanhantes adicionados.');
                 hasError = true;
                 break;
             }
@@ -206,10 +207,10 @@ export default function InvitePage() {
             placaCarro: formData.placaCarro,
             // Remove acompanhantes vazios se o usuário clicou em adicionar mas não preencheu
             acompanhantes: acompanhantes
-                .filter(a => a.nome.trim() !== '' && a.cpf.trim() !== '')
+                .filter(a => a.nome.trim() !== '' && a.sobrenome.trim() !== '' && a.cpf.trim() !== '')
                 .map(a => ({
                     nome: a.nome,
-                    sobrenome: '', // Mantém compatibilidade com backend atual
+                    sobrenome: a.sobrenome,
                     cpf: a.cpf
                 }))
         };
@@ -362,8 +363,12 @@ export default function InvitePage() {
                                         {acompanhantes.map((item, index) => (
                                             <div key={index} className="companion-row">
                                                 <div className="companion-inputs">
-                                                    <input type="text" placeholder="Nome do acompanhante" className="input-field"
+                                                    <input type="text" placeholder="Nome" className="input-field"
                                                         value={item.nome} onChange={(e) => handleAcompanhanteChange(index, 'nome', e.target.value)} required disabled={isLoading} />
+                                                </div>
+                                                <div className="companion-inputs">
+                                                    <input type="text" placeholder="Sobrenome" className="input-field"
+                                                        value={item.sobrenome} onChange={(e) => handleAcompanhanteChange(index, 'sobrenome', e.target.value)} required disabled={isLoading} />
                                                 </div>
                                                 <div className="companion-inputs">
                                                     <input
